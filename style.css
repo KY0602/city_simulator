@@ -1,0 +1,194 @@
+body {
+    /*background-image: url("resources/background.jpg");*/
+	/*background-size: cover;*/
+}
+
+h2 {
+	color: black;
+	text-align: center;
+	font-family: "Lucida Bright";
+}
+
+#desc {
+	color: black;
+	border: 2px solid black;
+	padding: 10px;
+	border-radius: 10px;
+}
+
+#main {
+    text-align: center;
+    color: black;
+}
+
+.row {
+	display: flex;
+	flex-wrap: wrap;
+	padding: 0 4px;
+}
+
+.block {
+	flex: 25%;
+	max-width: 50%;
+	text-align: center;
+}
+
+#blockchain {
+    border: 1px solid black;
+	height: 400px;
+	width: 30%;
+	display: inline-block;
+    background-color: black;
+	color: green;
+	text-align: left;
+	vertical-align: top;
+	border-radius: 5px;
+	overflow: scroll;
+	font-family: "Consolas";
+	font-size: 12px;
+}
+
+#demo_map {
+	border: 1px solid black;
+	height: 400px;
+	width: 30%;
+	display: inline-block;
+	vertical-align: top;
+	border-radius: 5px;
+}
+
+#traffic {
+    border: 1px solid black;
+	height: 400px;
+	width: 30%;
+	display: inline-block;
+    /*background-color: mintcream;*/
+	vertical-align: top;
+	border-radius: 5px;
+}
+
+.sidenav {
+	height: 380px;
+  	width: 100px;
+	border: 1px solid black;
+	color: white;
+  	position: absolute;
+  	background-color: black;
+  	overflow-x: hidden;
+  	transition: 0.5s;
+}
+
+.sidenav a {
+	padding: 8px 8px 10px 0px;
+  	text-decoration: none;
+  	font-size: 18px;
+  	color: white;
+  	display: block;
+  	transition: 0.3s;
+}
+
+.sidenav a:hover {
+	color: silver;
+}
+
+#traffic-main {
+	height: 100%;
+	background-color: black;
+	color: green;
+	text-align: left;
+	padding-left: 105px;
+	overflow: scroll;
+	font-family: "Consolas";
+	font-size: 12px;
+}
+
+.panel {
+	border: 2px solid black;
+	width: 90%;
+	min-height: 10px;
+	margin: auto;
+	padding: 10px;
+	border-radius: 10px;
+}
+
+#searchbar{
+	border: 1px solid black;
+	padding: 15px;
+	border-radius: 10px;
+}
+
+input[type=text] {
+	width: 30%;
+	-webkit-transition: width 0.15s ease-in-out;
+	transition: width 0.15s ease-in-out;
+}
+
+#submit_btn {
+	border: 1px solid black;
+	padding: 10px;
+	border-radius: 10px;
+}
+
+#submit_btn img {
+	height: 100%;
+	width: 20px;
+}
+
+table {
+	border: 2px solid black;
+	border-collapse: collapse;
+}
+
+th {
+	border: 2px solid black;
+	background-color: #dddddd;
+  	text-align: left;
+  	padding: 8px;
+}
+
+td {
+	color: black;
+  	border: 2px solid black;
+  	text-align: left;
+  	padding: 8px;
+}
+
+#search_full {
+	display: none;
+	/*margin-top: 10px;*/
+	/*margin-left: 23%;*/
+}
+
+#vc_button, #verify_button, #vc_button_2, #verify_button_2 {
+	display: none;
+	margin-top: 10px;
+	margin-bottom: 10px;
+}
+
+#loader {
+  	border: 10px solid #f3f3f3; /* Light grey */
+  	border-top: 10px solid #3498db; /* Blue */
+  	border-radius: 50%;
+	display: none;
+	margin-top: 20px;
+	margin-left: auto;
+	margin-right: auto;
+	width: 50px;
+  	height: 50px;
+  	animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+  	0% { transform: rotate(0deg); }
+  	100% { transform: rotate(360deg); }
+}
+
+.radioGroup label {
+  display: inline-block;
+  margin: 0 0.2em;
+  text-align: center;
+}
+
+.radioGroup label input[type="radio"] {
+  margin: 0.5em auto;
+}
