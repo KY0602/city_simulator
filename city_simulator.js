@@ -1,4 +1,4 @@
-let maps = document.getElementById("maps");
+﻿let maps = document.getElementById("maps");
 // let bounding_points = [[40.0254000, 116.9474000], [40.0479000, 116.9652000]];
 let bounding_points = [[40.0265, 116.9441000], [40.0452000, 116.9665000]];
 let map = L.map("demo_map", {
@@ -80,6 +80,7 @@ let res_txt = "";
 let acc_txt = "";
 let jam_txt = "";
 let hos_txt = "";
+let prob_home = 0.5;
 let running = true;
 let start_station_id = 0;
 let isInfected = false;
@@ -358,7 +359,8 @@ function busTravel(agent) {
     // Bus travel to next station
     var next_station_id = findNextStation(agent);
     var next_station = agentmap.bus_stations[next_station_id];
-    bus_txt += "Bus " + agent.num + " is travelling to Station " + next_station_id + " from Station " + agent.currentStation + ".<br>";
+    bus_txt += "Bus " + agent.num + " is travelling to Station " + next_station_id + " from Station " + agent.currentStation + ".<br>"
+    + agent.num + "公交车从第" + agent.currentStation + "站开往第" + next_station_id + "站。<br>";
     agent.currentStation = next_station_id;
     agent.scheduleTrip(next_station["center"], {type: "unit", id: next_station["id"]}, agent.speed, false, true);
     agent.dest_id = next_station["id"];
@@ -384,12 +386,10 @@ function carTravel(agent) {
 }
 
 function residentTravel(agent) {
-    // 50% probability that resident will travel
-    if (Math.random() > 0.5) return;
     // Update unit's resident
     residentLeaveUnit(agent.place.id, agent._leaflet_id);
-    // 50% probability travel to Home if not already at Home
-    if (agent.place.id != agent.home.id && Math.random() < 0.5) {
+    // Certain probability travel to Home if not already at Home
+    if (agent.place.id != agent.home.id && Math.random() < prob_home) {
         agent.travel_stops = plan_trip(agent.place.id, agent.home);
     } else {
         // Travel to random unit
@@ -413,7 +413,8 @@ function residentTravel(agent) {
 }
 
 async function reachedDestination(agent) {
-    blockchain.innerHTML += "Mileage of " + agent.num + " recorded in blockchain.<br>";
+    blockchain.innerHTML += "Mileage of " + agent.num + " recorded in blockchain.<br>" +
+        agent.num + "里程表数据已记录在区块链中。<br>";
     agent.mileage += agent.steps_made;
 
     agent.mileage_vc = await reached(agent, agent.steps_made, agentmap.state.ticks);
@@ -439,7 +440,8 @@ function checkInfection(agent) {
             var resident = agentmap.agents.getLayer(residents_num[i]);
             if (resident.isInfected) {
                 if (Math.random() < 0.5) {
-                    res_txt += "Resident " + agent.num + " infected.<br>";
+                    res_txt += "Resident " + agent.num + " infected.<br>"
+                    + agent.num + "居民被感染。<br>";
                     updateDisplay();
 
                     healthy_count--;
@@ -500,13 +502,16 @@ function setup() {
                     agent.passengers_amount = 0;
                     bus_txt += "Bus " + agent.num + " has arrived at Station "
                         + agentmap.bus_stations[agent.currentStation].stop_id +
-                        " after travelling for " +  agent.steps_made + " miles.<br>";
+                        " after travelling for " +  agent.steps_made + " miles.<br>"
+                        + agent.num + "公交车在第" + agentmap.bus_stations[agent.currentStation].stop_id
+                        + "站停靠，行驶了" + agent.steps_made + "英里。<br>";
                     updateDisplay();
                     reachedDestination(agent);
 
                     // If travelling to garage
                     if (agent.movingToGarage) {
-                        gar_txt += "Bus " + agent.num + " arrived at garage.<br>";
+                        gar_txt += "Bus " + agent.num + " arrived at garage.<br>"
+                        + agent.num + "公交车到达维修厂。<br>";
                         updateDisplay();
                         agent.inGarage = true;
                     }
@@ -557,15 +562,15 @@ function setup() {
                                 resident.speed = agent.speed;
                                 resident.scheduleTrip(next_station["center"], {type: "unit", id: next_station["id"]}, resident.speed, false, true);
                                 resident.dest_id = next_station["id"];
-                                // res_txt += "Resident " + resident.num + " is travelling to Station " + next_station_id
-                                    + " from Station " + agent.currentStation + " on Bus " + agent.num + ".<br>";
-                                // updateDisplay();
                             }
                             current_station.waiting = tmp;
 
                             agent.reachedDest = false;
                             agent.arrivalTicks = 0;
-                            bus_txt += "Bus " + agent.num + " is travelling to Station " + next_station_id + " from Station " + agent.currentStation + ".<br>";
+                            if (agent.currentStation != next_station_id) {
+                                bus_txt += "Bus " + agent.num + " is travelling to Station " + next_station_id + " from Station " + agent.currentStation + ".<br>"
+                                + agent.num + "公交车从第" + agent.currentStation + "站开往第" + next_station_id + "站。<br>"
+                            }
                             agent.currentStation = next_station_id;
                             agent.scheduleTrip(next_station["center"], {type: "unit", id: next_station["id"]}, agent.speed, false, true);
                             agent.dest_id = next_station["id"];
@@ -587,12 +592,13 @@ function setup() {
                             busTravel(agent);
 
                             gar_txt += "Bus " + agent.num + " left garage.<br>";
-                            blockchain.innerHTML += "Serviced history of bus " + agent.num + " recorded in blockchain.<br>";
+                            blockchain.innerHTML += "Serviced history of bus " + agent.num + " recorded in blockchain.<br>"
+                            + agent.num + "公交车的维修记录已被记录在区块链中。<br>";
                             updateDisplay();
                             agent.movingToGarage = false;
                             agent.inGarage = false;
 
-                            const event = "Serviced at garage";
+                            const event = "Serviced at garage 在维修厂维修";
                             agent.history.push({time: agentmap.state.ticks, event: event, type: "serviced"});
                             const history = agent.history.slice(Math.max(agent.history.length - 5, 0));
 
@@ -605,13 +611,15 @@ function setup() {
                 if ((agent.place.id == agent.dest_id) && !agent.reachedDest) {
                     agent.reachedDest = true;
                     arv_txt += "Car " + agent.num + " has arrived at destination, after travelling for "
-                        + agent.steps_made + " miles.<br>";
+                        + agent.steps_made + " miles.<br>"
+                        + agent.num + "车辆已到达目的地，行驶了" + agent.steps_made + "英里。<br>";
                     updateDisplay();
                     reachedDestination(agent);
 
                     // If travelling to garage
                     if (agent.movingToGarage) {
-                        gar_txt += "Car " + agent.num + " has arrived at garage.<br>";
+                        gar_txt += "Car " + agent.num + " has arrived at garage.<br>"
+                        + agent.num + "车辆已到达维修厂。<br>";
                         agent.inGarage = true;
                         updateDisplay();
                     }
@@ -631,13 +639,15 @@ function setup() {
                         if (agent.arrivalTicks >= 500) {
                             carTravel(agent);
 
-                            gar_txt += "Car " + agent.num + " left garage.<br>";
-                            blockchain.innerHTML += "Serviced history of car " + agent.num + " recorded in blockchain.<br>";
+                            gar_txt += "Car " + agent.num + " left garage.<br>"
+                            + agent.num + "车辆已离开维修厂。<br>";
+                            blockchain.innerHTML += "Serviced history of car " + agent.num + " recorded in blockchain.<br>"
+                            + agent.num + "车辆的维修记录已被记录在区块链中。<br>";
                             updateDisplay();
                             agent.movingToGarage = false;
                             agent.inGarage = false;
 
-                            const event = "Serviced at garage";
+                            const event = "Serviced at garage 在维修厂维修";
                             agent.history.push({time: agentmap.state.ticks, event: event, type: "serviced"});
                             const history = agent.history.slice(Math.max(agent.history.length - 5, 0));
 
@@ -651,12 +661,14 @@ function setup() {
                     (agentmap.streets._layers[agent.place.id].feature.properties.id == "way/845918867")) {
                         if ((agent.trip.speed > 3) && !agent.speedingCaught && !agent.movingToGarage) {
                             var speed = (agent.trip.speed * 50).toFixed(2);
-                            spe_txt += "Camera at Street " + agent.place.id + " caught Car " + agent.num + " speeding at " + speed + " km/h.<br>";
+                            spe_txt += "Camera at Street " + agent.place.id + " caught Car " + agent.num + " speeding at " + speed + " km/h.<br>"
+                            + agent.place.id + "街道上的摄像头拍到了" + agent.num + "车辆超速，时速为" + speed + "公里/小时。<br>";
                             agent.speedingCaught = true;
                             updateDisplay();
                             agent.offense.push("speeding");
                             susAgent.add(agent);
-                            const event = "Speeding at Street " + agent.place.id + " at speed " + speed + " km/h";
+                            const event = "Speeding at Street " + agent.place.id + " at speed " + speed + " km/h 在"
+                            + agent.place.id + "街道上超速，时速为" + speed + "公里/小时";
                             agent.history.push({time: agentmap.state.ticks, event: event, type: "speeding"});
                         }
                 }
@@ -675,7 +687,8 @@ function setup() {
                 if ((agent.place.id == agent.dest_id) && !agent.reachedDest) {
                     agent.reachedDest = true;
                     arv_txt += "Tow Truck " + agent.num + " has arrived at destination, after travelling for "
-                        + agent.steps_made + " miles.<br>";
+                        + agent.steps_made + " miles.<br>"
+                        + agent.num + "拖车已到达目的地，行驶了" + agent.steps_made + "英里。<br>";
                     updateDisplay();
                     reachedDestination(agent);
 
@@ -725,7 +738,8 @@ function setup() {
                             tmp.jammedAgents = [];
                             tmp.movingToGarage = true;
                         }
-                        jam_txt += "Traffic jam at Street " + agent.place.id + " cleared.<br>";
+                        jam_txt += "Traffic jam at Street " + agent.place.id + " cleared.<br>"
+                        + agent.place.id + "街道上的交通堵塞已清除。<br>";
                         updateDisplay();
 
                         // Move to garage
@@ -750,7 +764,8 @@ function setup() {
                     // All passengers arrived at hospital
                     for (var i = 0; i < agent.current_passengers.length; i++) {
                         var resident = agentmap.agents.getLayer(agent.current_passengers[i]._leaflet_id);
-                        hos_txt += "Resident " + resident.num + " has arrived at Hospital " + agent.target_hospital["id"] + ".<br>";
+                        hos_txt += "Resident " + resident.num + " has arrived at Hospital " + agent.target_hospital["id"] + ".<br>"
+                        + resident.num + "居民已到达医院" + agent.target_hospital["id"] + "。<br>";
                         quarantined_count++;
                         quarantined_residents.innerHTML = quarantined_count.toString();
 
@@ -758,7 +773,8 @@ function setup() {
 
                         // Modify resident's status in database
                         await residentToHospital(resident.num, 1, agent.target_hospital["id"], resident.history, -1);
-                        blockchain.innerHTML += "Status of Resident " + resident.num + " updated in blockchain.<br>";
+                        blockchain.innerHTML += "Status of Resident " + resident.num + " updated in blockchain.<br>"
+                        + resident.num + "居民的状态已在区块链中更新。<br>";
 
                         resident.reachedDest = true;
                         resident.reached_hospital = true;
@@ -844,7 +860,8 @@ function setup() {
                     agent.history.push(event);
                     agent.reachedDest = true;
                     agent.vc.push(await updateResidentTravel(agent, event.time, event.on, event.off));
-                    blockchain.innerHTML += "Resident " + agent.num + " boarding history recorded on blockchain.<br>";
+                    blockchain.innerHTML += "Resident " + agent.num + " boarding history recorded on blockchain.<br>"
+                    + agent.num + "居民乘车记录已在区块链中更新。<br>";
                 }
 
                 // Residents arrived in "dest"
@@ -856,8 +873,6 @@ function setup() {
                         // Check whether infected
                         checkInfection(agent);
                         agent.reachedDest = true;
-                        // res_txt += "Resident " + agent.num + " has arrived at Unit " + agent.place.id + ".<br>";
-                        // updateDisplay();
                     } else {
                         if (!agent.isInfected) {
                             // Wait for 300 ticks before moving again
@@ -872,7 +887,8 @@ function setup() {
                                 if (agent.place.id == agent.home.id) {
                                     if (Math.random() < 0.99) {
                                         agent.reported = true;
-                                        res_txt += "Resident " + agent.num + " reported symptoms.<br>";
+                                        res_txt += "Resident " + agent.num + " reported symptoms.<br>"
+                                        + agent.num + "居民上报了症状。<br>";
                                         updateDisplay();
 
                                         const tmp = {id: agent.place.id, agents: agent};
@@ -887,7 +903,8 @@ function setup() {
                 // If resident in hospital, recover after 1000 ticks
                 if (agent.reached_hospital) {
                     if (agent.arrivalTicks > 1000) {
-                        hos_txt += "Resident " + agent.num + " has recovered.<br>";
+                        hos_txt += "Resident " + agent.num + " has recovered.<br>"
+                        + agent.num + "居民已康复。<br>";
                         updateDisplay();
 
                         agent.isImmune = true;
@@ -902,7 +919,8 @@ function setup() {
 
                         // Update resident's status in database
                         agent.immune_vc = await residentLeaveHospital(agent.num, 2, agent.target_hospital["id"], agent.history, agentmap.state.ticks);
-                        blockchain.innerHTML += "Resident " + agent.num + " recovery history recorded on blockchain.<br>";
+                        blockchain.innerHTML += "Resident " + agent.num + " recovery history recorded on blockchain.<br>"
+                        + agent.num + "居民康复记录已在区块链中更新。<br>";
 
                         agent.target_hospital["amount"] -= 1;
                         // Remove patient from hospital in database
@@ -947,24 +965,28 @@ function setup() {
                                 agent.current_fining = ag;
 
                                 // Update police car's history
-                                const event = "Deducted " + fine + " points from Car " + ag.num;
+                                const event = "Deducted " + fine + " points from Car " + ag.num
+                                + " 扣了" + ag.num + "车辆" + fine + "分";
                                 agent.history.push({time: agentmap.state.ticks, event: event, type: "fined"});
 
                                 // Take most recent 5 events from ag's history
                                 const ag_history = ag.history.slice(Math.max(ag.history.length - 5, 0));
 
-                                blockchain.innerHTML += "Points deduction of Car " + ag.num + " recorded in blockchain.<br>";
+                                blockchain.innerHTML += "Points deduction of Car " + ag.num + " recorded in blockchain.<br>"
+                                + ag.num + "车辆扣分记录已在区块链中更新。<br>";
                                 ag.fine_vc = await fineVehicle(ag, ag_history, fine, agentmap.state.ticks, agent.num);
 
                                 if (num_speedings > 0) {
-                                    pol_txt += "Police " + agent.num + " fined Car " + ag.num + " for " + num_speedings + " speeding(s).<br>";
+                                    pol_txt += "Police " + agent.num + " fined Car " + ag.num + " for " + num_speedings + " speeding(s).<br>"
+                                    + agent.num + "警车对" + ag.num + "车辆超速" + num_speedings + "次进行了罚款。<br>";
                                     updateDisplay();
                                     ag.setSpeed(1);
                                     ag.speed = 1;
                                 }
 
                                 if (illegal_plate) {
-                                    pol_txt += "Police " + agent.num + " fined Car " + ag.num + " for illegal plate.<br>";
+                                    pol_txt += "Police " + agent.num + " fined Car " + ag.num + " for illegal plate.<br>"
+                                    + agent.num + "警车对" + ag.num + "车辆违规车牌进行了罚款。<br>";
                                     ag.isRegisteringVC = true;
                                     // Generate new valid VC
                                     ag.vc = await generateVC(ag.num, true).then((response) => {
@@ -983,7 +1005,8 @@ function setup() {
                         if ((distance < 20) && (agent.type != "police") && (!agent.movingToGarage)) {
                             if (ag.collided) {
                                 if (ag.jammedAgents.length == 0) {
-                                    jam_txt += "Traffic jam at Street " + agent.place.id + ".<br>";
+                                    jam_txt += "Traffic jam at Street " + agent.place.id + ".<br>"
+                                    + agent.place.id + "街道发生了交通堵塞。<br>";
                                     updateDisplay();
                                 }
                                 ag.jammedAgents.push(agent);
@@ -1013,12 +1036,15 @@ function setup() {
                                 const tmp = {center: ag._latlng, agents: agents_involved};
                                 towTruckDest.push(tmp);
 
-                                acc_txt += "Accident between " + agent.num + " and " + ag.num + " at Street " + agent.place.id + ".<br>";
+                                acc_txt += "Accident between " + agent.num + " and " + ag.num + " at Street " + agent.place.id + ".<br>"
+                                + agent.place.id + "街道发生了" + agent.num + "和" + ag.num + "车辆的交通事故。<br>";
 
-                                var event = "Accident with " + ag.num + " at Street " + agent.place.id;
+                                var event = "Accident with " + ag.num + " at Street " + agent.place.id
+                                + " 在街道" + agent.place.id + "与" + ag.num + "发生了交通事故";
                                 agent.history.push({time: agentmap.state.ticks, event: event, type: "accident"});
 
-                                event = "Accident with " + agent.num + " at Street " + agent.place.id;
+                                event = "Accident with " + agent.num + " at Street " + agent.place.id
+                                + " 在街道" + agent.place.id + "与" + agent.num + "发生了交通事故";
                                 ag.history.push({time: agentmap.state.ticks, event: event, type: "accident"});
 
                                 contactInsurance(agent, ag, agentmap.state.ticks, agent.place.id);
@@ -1027,7 +1053,8 @@ function setup() {
                             }
                         } else if (distance < 20 && !ag.prev_vehicle.includes(agent.num) && !agent.prev_vehicle.includes(ag.num)
                         && !agent.offense.includes("illegal plate") && !agent.isRegisteringVC) {
-                            exc_txt += "Exchanging digital identity between " + agent.num + " and " + ag.num + ".<br>";
+                            exc_txt += "Exchanging digital identity between " + agent.num + " and " + ag.num + ".<br>"
+                            + agent.num + "和" + ag.num + "车辆进行了数字身份交换。<br>";
                             agent.prev_vehicle.push(ag.num);
                             ag.prev_vehicle.push(agent.num);
                             updateDisplay();
@@ -1037,12 +1064,14 @@ function setup() {
                             if ((ag.type == "car") && (agent.type != "police") && (ag.trip.speed > 3) && !ag.speedingCaught && !ag.movingToGarage) {
                                 var speed = (ag.trip.speed * 50).toFixed(2);
                                 spe_txt += "Car " + agent.num + " reported car " + ag.num + " speeding at " + speed + " km/h at Street "
-                                    + ag.place.id + ".<br>";
+                                    + ag.place.id + ".<br>"
+                                    + agent.num + "车辆报告了" + ag.num + "车辆在" + ag.place.id + "街道以" + speed + "km/h的速度超速行驶。<br>";
                                 updateDisplay();
                                 ag.speedingCaught = true;
                                 ag.offense.push("speeding");
                                 susAgent.add(ag);
-                                const event = "Speeding at Street " + ag.place.id + " at speed " + speed + " km/h";
+                                const event = "Speeding at Street " + agent.place.id + " at speed " + speed + " km/h 在"
+                                    + agent.place.id + "街道上超速，时速为" + speed + "公里/小时";
                                 ag.history.push({time: agentmap.state.ticks, event: event, type: "speeding"});
                             }
                         }

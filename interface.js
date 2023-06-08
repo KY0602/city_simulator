@@ -1,5 +1,25 @@
+﻿function normal_mode() {
+    document.getElementById("num_of_healthy_residents").value = 500;
+    document.getElementById("num_of_infected_residents").value = 5;
+    document.getElementById("num_of_vehicles").value = 50;
+    document.getElementById("num_of_police").value = 10;
+    document.getElementById("num_of_tow").value = 10;
+    document.getElementById("num_of_ambulance").value = 10;
+    prob_home = 0.5;
+}
+
+function contagion_mode() {
+    document.getElementById("num_of_healthy_residents").value = 500;
+    document.getElementById("num_of_infected_residents").value = 5;
+    document.getElementById("num_of_vehicles").value = 0;
+    document.getElementById("num_of_police").value = 0;
+    document.getElementById("num_of_tow").value = 0;
+    document.getElementById("num_of_ambulance").value = 10;
+    prob_home = 0.8;
+}
+
 async function start_sim_city() {
-    cur_status = 0;
+    cur_status = 10;
     if (agentmap.agents) reset_city();
     let num_of_healthy_residents = parseInt(document.getElementById("num_of_healthy_residents").value);
     let num_of_infected_residents = parseInt(document.getElementById("num_of_infected_residents").value);
@@ -69,7 +89,8 @@ async function start_sim_city() {
             hospital.push(tmp);
             // Add hospital to database
             await addHospital(random_unit_id);
-            blockchain.innerHTML += "Hospital " + random_unit_id + " is added to blockchain.<br>";
+            blockchain.innerHTML += "Hospital " + random_unit_id + " is added to blockchain.<br>"
+            + random_unit_id + "医院已添加到区块链。<br>";
         }
 
         // Generate Ambulances

@@ -1,4 +1,4 @@
-let input_event = document.getElementById("searchbar");
+﻿let input_event = document.getElementById("searchbar");
 input_event.addEventListener("keypress", function(event) {
     if (event.key == "Enter") {
         search();
@@ -73,11 +73,13 @@ async function exchange(agent, location) {
         "signature": agent.vc.proof.jws,
     }).then((response)=> {
         if (!response.data) {
-            exc_txt += "Illegal Agent " + agent.num + " reported at Street " + location + ".<br>";
+            exc_txt += "Illegal Agent " + agent.num + " reported at Street " + location + ".<br>"
+            + "假车牌车辆" + agent.num + "在街道" + location + "被发现。<br>";
             updateDisplay();
             agent.offense.push("illegal plate");
             susAgent.add(agent);
-            const event = "Illegal plate reported at Street " + location;
+            const event = "Illegal plate reported at Street " + location
+            + " 在街道" + location + "被发现假车牌";
             agent.history.push({time: agentmap.state.ticks, event: event, type: "illegal plate"});
         }
     })
@@ -388,7 +390,7 @@ async function searchResident(num) {
     document.getElementById("verify_button_2").style.display = "none";
     document.getElementById("vc_button_3").style.display = "inline";
     document.getElementById("verify_button_3").style.display = "inline";
-    document.getElementById("event_desc").innerHTML = "Recent Boarding Events";
+    document.getElementById("event_desc").innerHTML = "Recent Boarding Events 近期乘搭公交事件";
 
     let search_res = {};
 
@@ -408,13 +410,13 @@ async function searchResident(num) {
     if (resident) {
         search_res["num"] = resident._id;
 
-        if (resident.infection_status == 0) search_res["infection_status"] = "Healthy";
-        else if (resident.infection_status == 1) search_res["infection_status"] = "Infected";
-        else search_res["infection_status"] = "Recovered";
-        if (resident.quarantine_loc == -1) search_res["quarantine_loc"] = "None";
+        if (resident.infection_status == 0) search_res["infection_status"] = "Healthy 健康";
+        else if (resident.infection_status == 1) search_res["infection_status"] = "Infected 已感染";
+        else search_res["infection_status"] = "Recovered 康复";
+        if (resident.quarantine_loc == -1) search_res["quarantine_loc"] = "None 无";
         else search_res["quarantine_loc"] = "Hospital " + resident.quarantine_loc;
 
-        if (resident.recover_time == -1) search_res["recover_time"] = "None";
+        if (resident.recover_time == -1) search_res["recover_time"] = "None 无";
         else search_res["recover_time"] = resident.recover_time;
 
         search_res["history"] = resident.history;
@@ -422,14 +424,14 @@ async function searchResident(num) {
         if (resident2) {
             search_res["num"] = resident2.num;
 
-            if (!resident2.isInfected) search_res["infection_status"] = "Healthy";
-            else if (resident2.isInfected) search_res["infection_status"] = "Infected";
-            if (resident2.isImmune) search_res["infection_status"] = "Recovered";
+            if (!resident2.isInfected) search_res["infection_status"] = "Healthy 健康";
+            else if (resident2.isInfected) search_res["infection_status"] = "Infected 已感染";
+            if (resident2.isImmune) search_res["infection_status"] = "Recovered 康复";
 
             if (resident2.targetHospital) search_res["quarantine_loc"] = "Hospital " + resident2.target_hospital["id"];
-            else search_res["quarantine_loc"] = "None";
+            else search_res["quarantine_loc"] = "None 无";
 
-            if (resident2.recover_time == -1) search_res["recover_time"] = "None";
+            if (resident2.recover_time == -1) search_res["recover_time"] = "None 无";
             else search_res["recover_time"] = resident2.recover_time;
 
             search_res["history"] = resident2.history;
@@ -444,29 +446,29 @@ async function searchResident(num) {
     let profile_table = document.getElementById("profileTable");
     let tab =
         `<tr>
-            <th>Num</th>
+            <th>ID</th>
             <td>${search_res["num"]}</td>
         </tr>
         <tr>
-            <th>Infection Status</th>
+            <th>Infection Status 感染状态</th>
             <td>${search_res["infection_status"]}</td>
         </tr>
         <tr>
-            <th>Quarantine Location</th>
+            <th>Quarantine Location 隔离地点</th>
             <td>${search_res["quarantine_loc"]}</td>
         </tr>
         <tr>
-            <th>Recover Time</th>
+            <th>Recover Time 康复时间</th>
             <td>${search_res["recover_time"]}</td>
         </tr>`;
     let history_table = document.getElementById("search_res");
     if (search_res["history"].length > 0) {
         let tab2 =
             `<tr>
-              <th>Time</th>
-              <th>Bus</th>
-              <th>Boarding Station</th>
-              <th>Leaving Station</th>
+              <th>Time 时间</th>
+              <th>Bus 公交号</th>
+              <th>Boarding Station 上车车站</th>
+              <th>Leaving Station 下车车站</th>
              </tr>`;
         for (let i = 0; i < search_res["history"].length; i++) {
             tab2 +=
@@ -499,7 +501,7 @@ async function searchBus(num) {
     document.getElementById("verify_button_2").style.display = "none";
     document.getElementById("vc_button_3").style.display = "none";
     document.getElementById("verify_button_3").style.display = "none";
-    document.getElementById("event_desc").innerHTML = "Recent 5 Events";
+    document.getElementById("event_desc").innerHTML = "Recent 5 Events 近期5次事件";
 
     let search_res = {};
 
@@ -524,19 +526,19 @@ async function searchBus(num) {
     let profile_table = document.getElementById("profileTable");
     let tab =
         `<tr>
-            <th>Plate Num</th>
+            <th>Plate Num 车牌号</th>
             <td>${search_res["num"]}</td>
         </tr>
         <tr>
-            <th>Mileage</th>
+            <th>Mileage 里程表数据</th>
             <td>${search_res["mileage"]}</td>
         </tr>`;
     let history_table = document.getElementById("search_res");
     if (search_res["history"].length > 0) {
         let tab2 =
             `<tr>
-              <th>Time</th>
-              <th>Event</th>
+              <th>Time 时间</th>
+              <th>Event 事件</th>
              </tr>`;
         for (let i = 0; i < search_res["history"].length; i++) {
             if (search_res["history"][i]["type"] == "accident") {
@@ -581,7 +583,7 @@ async function searchVehicle(num) {
     document.getElementById("verify_button_2").style.display = "inline";
     document.getElementById("vc_button_3").style.display = "none";
     document.getElementById("verify_button_3").style.display = "none";
-    document.getElementById("event_desc").innerHTML = "Recent 5 Events";
+    document.getElementById("event_desc").innerHTML = "Recent 5 Events 近期5次事件";
 
     let search_res = {};
 
@@ -615,23 +617,23 @@ async function searchVehicle(num) {
     let profile_table = document.getElementById("profileTable");
     let tab =
         `<tr>
-            <th>Plate Num</th>
+            <th>Plate Num 车牌号</th>
             <td>${search_res["num"]}</td>
         </tr>
         <tr>
-            <th>Mileage</th>
+            <th>Mileage 里程表数据</th>
             <td>${search_res["mileage"]}</td>
         </tr>
         <tr>
-            <th>Deducted Points</th>
+            <th>Deducted Points 扣分数</th>
             <td>${search_res["deducted_points"]}</td>
         </tr>`;
     let history_table = document.getElementById("search_res");
     if (search_res["history"].length > 0) {
         let tab2 =
             `<tr>
-              <th>Time</th>
-              <th>Event</th>
+              <th>Time 时间</th>
+              <th>Event 事件</th>
              </tr>`;
         for (let i = 0; i < search_res["history"].length; i++) {
             if (search_res["history"][i]["type"] == "accident") {
@@ -676,7 +678,7 @@ async function searchPolice(num) {
     document.getElementById("verify_button_2").style.display = "none";
     document.getElementById("vc_button_3").style.display = "none";
     document.getElementById("verify_button_3").style.display = "none";
-    document.getElementById("event_desc").innerHTML = "Recent 5 Events";
+    document.getElementById("event_desc").innerHTML = "Recent 5 Events 近期5次事件";
 
     let search_res = {};
 
@@ -700,19 +702,19 @@ async function searchPolice(num) {
     let profile_table = document.getElementById("profileTable");
     let tab =
         `<tr>
-            <th>Plate Num</th>
+            <th>Plate Num 车牌号</th>
             <td>${search_res["num"]}</td>
         </tr>
         <tr>
-            <th>Mileage</th>
+            <th>Mileage 里程表数据</th>
             <td>${search_res["mileage"]}</td>
         </tr>`;
     let history_table = document.getElementById("search_res");
     if (search_res["history"].length > 0) {
         let tab2 =
             `<tr>
-              <th>Time</th>
-              <th>Event</th>
+              <th>Time 时间</th>
+              <th>Event 事件</th>
              </tr>`;
         for (let i = 0; i < search_res["history"].length; i++) {
             tab2 +=
@@ -734,7 +736,7 @@ async function searchPolice(num) {
 async function searchAccident(num) {
     let loading = document.getElementById("loader");
     loading.style.display = "block";
-    document.getElementById("event_desc").innerHTML = "Accidents involved";
+    document.getElementById("event_desc").innerHTML = "Accidents involved 事故记录";
     document.getElementById("not_found").style.display = "none";
     document.getElementById("search_full").style.display = "none";
     document.getElementById("search_res").innerHTML = "";
@@ -760,22 +762,22 @@ async function searchAccident(num) {
     let profile_table = document.getElementById("profileTable");
     let tab =
         `<tr>
-            <th>Plate Number</th>
+            <th>Plate Number 车牌号</th>
             <td>${num}</td>
         </tr>
         <tr>
-            <th>Number of Accidents</th>
+            <th>Number of Accidents 事故数</th>
             <td>${search_res["num"]}</td>
         </tr>`;
 
     let history_table = document.getElementById("search_res");
     let tab2 =
         `<tr>
-            <th>Time</th>
-            <th>Location</th>
-            <th>Vehicle 1</th>
-            <th>Vehicle 2</th>
-            <th>Responsible</th>
+            <th>Time 时间</th>
+            <th>Location 地点</th>
+            <th>Vehicle 1 涉事车辆1</th>
+            <th>Vehicle 2 涉事车辆2</th>
+            <th>Responsible 责任方</th>
         </tr>`;
     if (search_res["accidents"]) {
         for (let i = 0; i < search_res["accidents"].length; i++) {
@@ -809,7 +811,7 @@ async function searchHospital(num) {
     document.getElementById("verify_button_2").style.display = "none";
     document.getElementById("vc_button_3").style.display = "none";
     document.getElementById("verify_button_3").style.display = "none";
-    document.getElementById("event_desc").innerHTML = "Patients";
+    document.getElementById("event_desc").innerHTML = "Patients 患者";
 
     let search_res = {};
 
@@ -826,18 +828,18 @@ async function searchHospital(num) {
         let profile_table = document.getElementById("profileTable");
         let tab =
             `<tr>
-                <th>Num</th>
+                <th>ID</th>
                 <td>${hos._id}</td>
             </tr>
             <tr>
-                <th>No. of patients</th>
+                <th>No. of patients 患者数</th>
                 <td>${hos.no_of_patients}</td>
             </tr>`;
 
         let history_table = document.getElementById("search_res");
         let tab2 =
             `<tr>
-              <th>Patients</th>
+              <th>Patients 患者</th>
              </tr>`;
         for (let i = 0; i < hos.patients.length; i++) {
             tab2 += `<tr>
@@ -858,13 +860,13 @@ async function searchHospital(num) {
 function showVC(type) {
     if (type == 0) {
         if (mileage_vc) alert("VC: " + JSON.stringify(mileage_vc, null, 2));
-        else alert("No Mileage VC/Vehicle removed");
+        else alert("No Mileage VC 无里程表数据VC");
     } else if (type == 1) {
         if (fine_vc) alert("VC: " + JSON.stringify(fine_vc, null, 2));
-        else alert("No Fine VC/Vehicle removed");
+        else alert("No Fine VC 无扣分记录VC");
     } else if (type == 2) {
         if (immune_vc) alert("VC: " + JSON.stringify(immune_vc, null, 2));
-        else alert("No Immune VC/Agent removed");
+        else alert("No Immune VC 无免疫VC");
     }
 }
 
@@ -874,9 +876,9 @@ function verifyVC(type) {
             // First verify whether mileage in VC constant with mileage in vehicle
             const mileage_in_vc = mileage_vc.credentialSubject.mileage;
             if (mileage_in_vc != mileage) {
-                alert("Mileage in VC does not match mileage in vehicle!\n" +
-                    "Mileage on vehicle: " + mileage + "\n" +
-                    "Mileage in VC: " + mileage_in_vc + "\n");
+                alert("Mileage in VC does not match mileage in vehicle! 车辆里程表数据与VC数据不匹配\n" +
+                    "Mileage on vehicle: 车辆里程表数据：" + mileage + "\n" +
+                    "Mileage in VC: VC数据：" + mileage_in_vc + "\n");
                 return;
             }
 
@@ -886,13 +888,13 @@ function verifyVC(type) {
                 "signature": mileage_vc.proof.jws
             }).then((response) => {
                 if (!response.data) {
-                    alert("Invalid VC!");
+                    alert("Invalid VC! 非法VC！");
                 } else {
-                    alert("Valid VC!");
+                    alert("Valid VC! 有效VC！");
                 }
             })
         } else {
-            alert("No Mileage VC/Vehicle removed");
+            alert("No Mileage VC 无里程表数据VC");
         }
     } else if (type == 1 || type == 2) {
         const vc = type == 1 ? fine_vc : immune_vc;
@@ -903,13 +905,13 @@ function verifyVC(type) {
                 "signature": vc.proof.jws
             }).then((response) => {
                 if (!response.data) {
-                    alert("Invalid VC!");
+                    alert("Invalid VC! 非法VC！");
                 } else {
-                    alert("Valid VC!");
+                    alert("Valid VC! 有效VC！");
                 }
             })
         } else {
-            alert("No VC/Agent removed");
+            alert("No Fine VC 无扣分记录VC");
         }
     }
 }
@@ -919,8 +921,8 @@ function getVC_resident(num) {
     let agent = searchForAgent2(input);
     if (agent) {
         if (agent.vc[num]) alert("VC: " + JSON.stringify(agent.vc[num], null, 2));
-        else alert("No VC!");
-    } else alert("Resident not found!");
+        else alert("No VC! 无VC！");
+    } else alert("Resident not found! 未找到居民！");
 }
 
 function getAccidentVCByTime(num, time) {
@@ -933,7 +935,7 @@ function getAccidentVCByTime(num, time) {
             }
         }
     } else {
-        alert("No Accident VC/Vehicle removed");
+        alert("No Accident VC 无事故VC");
     }
 }
 
@@ -947,6 +949,6 @@ function getServiceVCByTime(num, time) {
             }
         }
     } else {
-        alert("No Service VC/Vehicle removed");
+        alert("No Service VC 无维修VC");
     }
 }

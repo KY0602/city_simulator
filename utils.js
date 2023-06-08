@@ -1,4 +1,4 @@
-function searchForAgent(plate) {
+﻿function searchForAgent(plate) {
     if (!agentmap.agents) return null;
     for (let i = 0; i < agentmap.agents.count(); i++) {
         let agent = agentmap.agents.getLayers()[i];
@@ -78,38 +78,5 @@ async function contactInsurance(agent1, agent2, time, location) {
     agent2.accident_vcs.push(vc);
 
     blockchain.innerHTML += "Accident between " + agent1.num + " and " + agent2.num +
-        " is recorded in blockchain.<br>";
-}
-
-async function contactInsurance2(agent1, agent2, time, location) {
-    let responsible = "";
-    // Extract and verify VC from agent1 and agent2
-    let vc1 = agent1.vc;
-    let vc2 = agent2.vc;
-    let vc1_verified = await verifyIdentityVC(vc1);
-    let vc2_verified = await verifyIdentityVC(vc2);
-
-    // Check both agent's speed
-    let speed_1 = agent1.speed;
-    let speed_2 = agent2.speed;
-
-    // If both agents are speeding, then both are responsible
-    if (speed_1 > 3 && speed_2 > 3) responsible = "Both";
-    // If only agent1 is speeding, then agent1 is responsible
-    else if (speed_1 > 3) responsible = agent1.plate_num;
-    // If only agent2 is speeding, then agent2 is responsible
-    else if (speed_2 > 3) responsible = agent2.plate_num;
-    // If both agents are not speeding, then the agent with unverified VC is responsible
-    else if (!vc1_verified) responsible = agent1.plate_num;
-    else if (!vc2_verified) responsible = agent2.plate_num;
-    // If both agents are not speeding and both have verified VC, then both are responsible
-    else responsible = "Both";
-
-    // Add to database
-    let vc = await addAccident(agent1.plate_num, agent2.plate_num, time, location, responsible);
-    agent1.accident_vcs.push(vc);
-    agent2.accident_vcs.push(vc);
-
-    blockchain.innerHTML += "Accident between " + agent1.plate_num + " and " + agent2.plate_num +
-        " is recorded in blockchain.<br>";
+        " is recorded in blockchain.<br>" + "车辆" + agent1.num + "和" + agent2.num + "事故记录已经写入区块链。<br>";
 }

@@ -12,31 +12,43 @@
     <link rel="stylesheet" href="resources/leaflet.fullscreen.css">
     <link rel="stylesheet" href="style.css">
     <link rel="icon" href="resources/city.png">
+    <meta charset="UTF-8">
     <title>City Simulator</title>
 </head>
 
 <body>
-<h2>City Simulator</h2>
+<h2>City Scale Traffic and Emergency Response Simulator</h2>
+<h2>城市交通与医疗应急救护仿真</h2>
 <div id="desc">This is a city simulator that simulates a city ecosystem to showcase how digital identity could apply in various scenarios. <br>
     You can customize the number of residents(healthy or infected), vehicles, police cars, trucks and ambulances in the simulation. <br>
-    The scenarios include the spreading of pandemic, accidents, speedings and travelling of buses. </div>
+    The scenarios include the spreading of pandemic, accidents, speedings and travelling of buses. <br>
+    这是一个模拟了城市生态系统的仿真，用以展示数字身份在各种场景中的应用。<br>
+    你可以自定义仿真中的居民（健康或感染者）、车辆、警车、拖车和救护车的数量。<br>
+    场景包括疫情传播、事故、超速和公交车的行驶。
+</div>
 </div>
 <br>
 <div id="main">
     <div class="row">
         <div class="block">
             <div style="font-size: 20px;font-family: 'Lucida Bright'">Blockchain Log</div>
+            <div style="font-size: 20px;font-family: 'Lucida Bright'">区块链记录</div>
             <br>
             All changes to blockchain are logged here.
+            <br>
+            对区块链的写入操作都会在这里记录。
         </div>
         <div class="block">
             <div style="font-size: 20px;font-family: 'Lucida Bright'">Map Display</div>
+            <div style="font-size: 20px;font-family: 'Lucida Bright'">仿真地图</div>
             <div id="clock">0</div>
         </div>
         <div class="block">
             <div style="font-size: 20px;font-family: 'Lucida Bright';margin-right: 100px">Events</div>
+            <div style="font-size: 20px;font-family: 'Lucida Bright';margin-right: 100px">事件</div>
             <br>
             <div style="margin-right: 70px">All map events are logged here.</div>
+            <div style="margin-right: 70px">仿真中的事件都会在这里记录。</div>
         </div>
     </div>
     <br>
@@ -44,50 +56,54 @@
     <div id="demo_map"></div>
     <div id="traffic">
         <div id="traffic_nav" class="sidenav">
-            <a onclick="showArrivals()">Car Arrivals</a>
-            <a onclick="showExchanges()">Exchanges</a>
-            <a onclick="showSpeedings()">Speedings</a>
-            <a onclick="showPolice()">Police Events</a>
-            <a onclick="showAccidents()">Accidents</a>
-            <a onclick="showJams()">Traffic Jams</a>
-            <a onclick="showGarage()">Garage</a>
-            <a onclick="showBuses()">Bus</a>
-            <a onclick="showResidents()">Residents</a>
-            <a onclick="showHospital()">Hospital</a>
+            <a onclick="showResidents()">Residents<br>居民</a>
+            <a onclick="showHospital()">Hospital<br>医院</a>
+            <a onclick="showArrivals()">Car Arrivals<br>车辆抵达</a>
+            <a onclick="showExchanges()">Exchanges<br>身份交换</a>
+            <a onclick="showSpeedings()">Speedings<br>超速</a>
+            <a onclick="showPolice()">Police Events<br>警车事件</a>
+            <a onclick="showAccidents()">Accidents<br>交通事故</a>
+            <a onclick="showJams()">Traffic Jams<br>交通堵塞</a>
+            <a onclick="showGarage()">Garage<br>维修厂</a>
+            <a onclick="showBuses()">Bus<br>公交</a>
         </div>
         <div id="traffic-main"></div>
     </div>
 
     <br>
     <br>
-    <div>Control Panel</div>
+    <div>Control Panel 控制台</div>
     <div class="panel">
-        Number of healthy residents: <input type="number" id="num_of_healthy_residents" min="0" value="5">
-        Number of infected residents: <input type="number" id="num_of_infected_residents" min="0" value="5">
-        Number of vehicles: <input type="number" id="num_of_vehicles" min="0" value="5">
+        <button type="Button" class="btn btn-primary" id="normal" onclick="normal_mode()">Normal Mode 普通模式</button>
+        <button type="Button" class="btn btn-primary" id="contagion" onclick="contagion_mode()">Contagion Mode 传染病模式</button>
         <br><br>
-        Number of police cars: <input type="number" id="num_of_police" min="0" value="1">
-        Number of tow trucks: <input type="number" id="num_of_tow" min="0" value="1">
-        Number of ambulances: <input type="number" id="num_of_ambulance" min="0" value="1">
+        Number of healthy residents: 健康居民人数：<input type="number" id="num_of_healthy_residents" min="0" value="5">
+        Number of infected residents: 已感染居民人数：<input type="number" id="num_of_infected_residents" min="0" value="5">
         <br><br>
-        <button type="Button" class="btn btn-primary" id="start" onclick="start_sim_city()">Start</button>
-        <button type="Button" class="btn btn-primary" id="stop" onclick="stop_sim()">Stop</button>
-        <button type="Button" class="btn btn-primary" id="resume" onclick="resume_sim()">Resume</button>
-        <button type="Button" class="btn btn-primary" id="reset" onclick="reset_sim_city()">Reset</button>
+        Number of vehicles: 车辆个数：<input type="number" id="num_of_vehicles" min="0" value="5">
+        Number of police cars: 警车个数：<input type="number" id="num_of_police" min="0" value="1">
+        <br><br>
+        Number of tow trucks: 拖车个数：<input type="number" id="num_of_tow" min="0" value="1">
+        Number of ambulances: 救护车个数：<input type="number" id="num_of_ambulance" min="0" value="1">
+        <br><br>
+        <button type="Button" class="btn btn-primary" id="start" onclick="start_sim_city()">Start 开始仿真</button>
+        <button type="Button" class="btn btn-primary" id="stop" onclick="stop_sim()">Stop 暂停仿真</button>
+        <button type="Button" class="btn btn-primary" id="resume" onclick="resume_sim()">Resume 恢复仿真</button>
+        <button type="Button" class="btn btn-primary" id="reset" onclick="reset_sim_city()">Reset 重启仿真</button>
     </div>
     <br>
-    <div>Statistics</div>
+    <div>Statistics 感染数据</div>
     <div class="panel">
-        Healthy Residents: <span id="healthy_residents" style="color: blue">0</span>
-        Infected Residents: <span id="infected_residents" style="color: red">0</span>
-        Quarantined Residents: <span id="quarantined_residents" style="color: orange">0</span>
-        Recovered Residents: <span id="recovered_residents" style="color: green">0</span>
+        Healthy Residents: 健康居民：<span id="healthy_residents" style="color: blue">0</span>
+        Infected Residents: 已感染居民：<span id="infected_residents" style="color: red">0</span>
+        Quarantined Residents: 隔离中居民：<span id="quarantined_residents" style="color: orange">0</span>
+        Recovered Residents: 已康复居民：<span id="recovered_residents" style="color: green">0</span>
     </div>
     <br>
-    <div>Search on blockchain</div>
+    <div>Search on blockchain 区块链上搜索</div>
     <div class="panel">
         <div class="input-group mb-3" id="search_div" style="width: 50%; margin:auto">
-          <input type="text" id="searchbar" class="form-control" placeholder="Search" aria-label="Search" aria-describedby="button-addon2">
+          <input type="text" id="searchbar" class="form-control" placeholder="Search 搜索" aria-label="Search" aria-describedby="button-addon2">
           <div class="input-group-append">
             <button class="btn btn-outline-secondary" type="button" id="submit_btn" style="margin-left: 10px"
                     onclick="search()"><img src="resources/search.png"></button>
@@ -95,22 +111,22 @@
         </div>
         <form>
           <fieldset class="radioGroup">
-              <label><input type="radio" name="typeSearch" value="resident" checked>Resident</label>
-              <label><input type="radio" name="typeSearch" value="vehicle">Vehicle</label>
-              <label><input type="radio" name="typeSearch" value="accident">Accident</label>
-              <label><input type="radio" name="typeSearch" value="hospital">Hospital</label>
+              <label><input type="radio" name="typeSearch" value="resident" checked>Resident 居民</label>
+              <label><input type="radio" name="typeSearch" value="vehicle">Vehicle 车辆</label>
+              <label><input type="radio" name="typeSearch" value="accident">Accident 交通事故</label>
+              <label><input type="radio" name="typeSearch" value="hospital">Hospital 医院</label>
           </fieldset>
         </form>
         <div id="loader"></div>
-        <div id="not_found" style="display: none">Not Found!</div>
+        <div id="not_found" style="display: none">Not Found! 未找到！</div>
         <!--Search result-->
         <div class="container-fluid" id="search_full">
-            <button type="button" class="btn btn-primary" id="vc_button" onclick="showVC(0)">Show Mileage VC</button>
-            <button type="button" class="btn btn-primary" id="verify_button" onclick="verifyVC(0)">Verify Mileage VC</button>
-            <button type="button" class="btn btn-primary" id="vc_button_2" onclick="showVC(1)">Show Fine VC</button>
-            <button type="button" class="btn btn-primary" id="verify_button_2" onclick="verifyVC(1)">Verify Fine VC</button>
-            <button type="button" class="btn btn-primary" id="vc_button_3" onclick="showVC(2)">Show Immune VC</button>
-            <button type="button" class="btn btn-primary" id="verify_button_3" onclick="verifyVC(2)">Verify Immune VC</button>
+            <button type="button" class="btn btn-primary" id="vc_button" onclick="showVC(0)">Show Mileage VC 查看里程表数据VC</button>
+            <button type="button" class="btn btn-primary" id="verify_button" onclick="verifyVC(0)">Verify Mileage VC 验证里程表数据VC</button>
+            <button type="button" class="btn btn-primary" id="vc_button_2" onclick="showVC(1)">Show Fine VC 查看扣分记录VC</button>
+            <button type="button" class="btn btn-primary" id="verify_button_2" onclick="verifyVC(1)">Verify Fine VC 验证扣分记录VC</button>
+            <button type="button" class="btn btn-primary" id="vc_button_3" onclick="showVC(2)">Show Immune VC 查看免疫VC</button>
+            <button type="button" class="btn btn-primary" id="verify_button_3" onclick="verifyVC(2)">Verify Immune VC 验证免疫VC</button>
             <br><br>
             <div class="row">
                 <div class="col-sm-6" id="profile">
@@ -120,7 +136,7 @@
                 </div>
                 <div class="col-sm-6" id ="history">
                   <!-- The history table -->
-                  <div id="event_desc">Recent Accidents</div>
+                  <div id="event_desc">Recent Accidents 近期交通事故</div>
                   <table id ="search_res" class ="table table-striped">
                   </table>
                 </div>
@@ -128,9 +144,6 @@
         </div>
     </div>
 </div>
-<!--<script src="js/test.js"></script>-->
-<!--<script src="js/test_streets_data.js"></script>-->
-<!--<script src="js/test_units_data.js"></script>-->
 <script src="js/sanhe.js"></script>
 <script src="js/sanhe_streets_data.js"></script>
 <script src="js/sanhe_units_data.js"></script>
@@ -138,12 +151,12 @@
 <script src="js/spritegents.js"></script>
 <script src="js/axios.min.js"></script>
 <script src="js/Leaflet.fullscreen.min.js"></script>
-<script src="city_simulator.js"></script>
+<script type="text/javascript" charset="utf-8" src="city_simulator.js"></script>
 <script src="icons.js"></script>
-<script src="city_connector.js"></script>
-<script src="interface.js"></script>
+<script type="text/javascript" charset="utf-8" src="city_connector.js"></script>
+<script type="text/javascript" charset="utf-8" src="interface.js"></script>
 <script src="events.js"></script>
-<script src="utils.js"></script>
+<script type="text/javascript" charset="utf-8" src="utils.js"></script>
 </body>
 
 </html>
