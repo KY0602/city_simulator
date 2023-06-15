@@ -11,5 +11,5 @@ The backend is implemented with Node.js and Express.js, and the database is impl
 
 1. Run `npm install` in `server` folder.
 2. Start the server by running `node city_server.js` in `server` folder.
-3. Change server address(server_url) in `city_simulator.js`. (64th line)
+3. Change server address(`server_url`) in `city_simulator.js`. (64th line)
 4. Open `city_main.html` in main directory to run the simulator.
